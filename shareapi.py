@@ -43,7 +43,7 @@ templates = Jinja2Templates(directory="templates")
 #     }
 
 
-def get_product(product_id: int):
+def get_product(product_id: str):
 
     return {
         "id": product_id,
@@ -55,7 +55,7 @@ def get_product(product_id: int):
 
 
 @router.get("/shareapi/{product_id}", response_class=HTMLResponse)
-async def share_product(request: Request, product_id: int):
+async def share_product(request: Request, product_id: str):
 
     product = get_product(product_id)
 
