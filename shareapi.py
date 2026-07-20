@@ -3,8 +3,10 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
+from fastapi import APIRouter
 
-app = FastAPI()
+router = APIRouter()
+# app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
 
@@ -52,7 +54,7 @@ def get_product(product_id: int):
 
 
 
-@app.get("/share/{product_id}", response_class=HTMLResponse)
+@router.get("/shareapi/{product_id}", response_class=HTMLResponse)
 async def share_product(request: Request, product_id: int):
 
     product = get_product(product_id)
