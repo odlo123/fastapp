@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>{{ product.title }}</title>
+
+    <meta property="og:title" content="{{ product.title }}">
+
+    <meta property="og:description" content="{{ product.price }}">
+
+    <meta property="og:image" content="{{ product.image }}">
+
+    <meta property="og:url" content="https://api.hahishapp.com/share/{{ product.id }}">
+
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="twitter:title" content="{{ product.title }}">
+
+    <meta name="twitter:description" content="{{ product.price }}">
+
+    <meta name="twitter:image" content="{{ product.image }}">
+
+
+    <script>
+
+        setTimeout(function () {
+
+            window.location =
+                "hahishapp://product/{{ product.id }}";
+
+        }, 3000);
+
+    </script>
+
+</head>
+
+<body>
+
+    <h1>{{ product.title }}</h1>
+
+    <img src="{{ product.image }}" width="300">
+
+    <h2>{{ product.price }}</h2>
+
+    <p>
+
+        Opening HahishApp...
+
+    </p>
+
+</body>
+
+</html>
