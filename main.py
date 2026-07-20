@@ -32,9 +32,7 @@ from hybrid     import HybridRecommender, RecommendationResult
 from shareapi import router as share_router 
 
 
-app.include_router(
-    share_router
-)
+
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(
     title       = "Rwanda E-Commerce Hybrid Recommender",
@@ -61,6 +59,9 @@ engine   = HybridRecommender(products, users, matrix)
 _elapsed = time.perf_counter() - _t0
 print(f"✅  Models ready in {_elapsed * 1000:.1f} ms")
 
+app.include_router(
+    share_router
+)
 
 # ── Pydantic schemas ──────────────────────────────────────────────────────────
 class RecommendationItem(BaseModel):
