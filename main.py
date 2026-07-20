@@ -29,7 +29,12 @@ from pydantic import BaseModel, Field, field_validator
 # ── Internal imports ──────────────────────────────────────────────────────────
 from data       import get_products_df, get_users_df, get_interaction_matrix
 from hybrid     import HybridRecommender, RecommendationResult
+from share import router as share_router
 
+
+app.include_router(
+    share_router
+)
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(
     title       = "Rwanda E-Commerce Hybrid Recommender",
