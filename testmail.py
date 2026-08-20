@@ -1,7 +1,9 @@
-import smtplib
+import os
 import socket
+import smtplib
 import traceback
 from email.message import EmailMessage
+
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -9,10 +11,13 @@ router = APIRouter()
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
 
-SMTP_USERNAME = "hahishapp@gmail.com"
-SMTP_PASSWORD = "oschbpcxwcgmrfzv"
+SMTP_USERNAME = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASS")
 
-TEST_RECEIVER = "urugendoturimo@gmail.com"
+TEST_RECEIVER = os.getenv(
+    "TEST_RECEIVER",
+    "urugendoturimo@gmail.com"
+)
 
 
 async def send_test_email():
@@ -23,10 +28,16 @@ async def send_test_email():
 
     try:
         ip = socket.gethostbyname(SMTP_HOST)
-        print(f"DNS OK: {SMTP_HOST} -> {ip}")
+
+        print(
+            f"DNS OK: {SMTP_HOST} -> {ip}"
+        )
+
     except Exception as e:
+
         print("DNS FAILED:", repr(e))
         traceback.print_exc()
+
         return False
 
     print("=" * 50)
@@ -34,19 +45,29 @@ async def send_test_email():
     print("=" * 50)
 
     try:
+
         sock = socket.create_connection(
             (SMTP_HOST, SMTP_PORT),
             timeout=15
         )
 
-        print(f"TCP CONNECTION OK: {SMTP_HOST}:{SMTP_PORT}")
+        print(
+            f"TCP CONNECTION OK: "
+            f"{SMTP_HOST}:{SMTP_PORT}"
+        )
 
         sock.close()
 
     except Exception as e:
-        print(f"TCP CONNECTION FAILED: {SMTP_HOST}:{SMTP_PORT}")
+
+        print(
+            f"TCP CONNECTION FAILED: "
+            f"{SMTP_HOST}:{SMTP_PORT}"
+        )
+
         print("ERROR:", repr(e))
         traceback.print_exc()
+
         return False
 
     print("=" * 50)
@@ -54,6 +75,14 @@ async def send_test_email():
     print("=" * 50)
 
     try:
+
+        if not SMTP_USERNAME:
+            print("ERROR: SMTP_USER is not configured")
+            return False
+
+        if not SMTP_PASSWORD:
+            print("ERROR: SMTP_PASS is not configured")
+            return False
 
         message = EmailMessage()
 
@@ -112,8 +141,15 @@ HahishApp
         print("SMTP TEST FAILED")
         print("=" * 50)
 
-        print("ERROR TYPE:", type(e).__name__)
-        print("ERROR:", repr(e))
+        print(
+            "ERROR TYPE:",
+            type(e).__name__
+        )
+
+        print(
+            "ERROR:",
+            repr(e)
+        )
 
         traceback.print_exc()
 
@@ -128,6 +164,8 @@ async def test_email():
     return {
         "success": result
     }
+
+
 @router.get("/test-email-ports")
 async def test_email_ports():
 
@@ -135,25 +173,40 @@ async def test_email_ports():
 
     for port in [465, 587]:
 
+        print("=" * 50)
+        print(
+            f"TESTING SMTP PORT {port}"
+        )
+        print("=" * 50)
+
         try:
-            print(f"Testing smtp.gmail.com:{port}")
 
             sock = socket.create_connection(
-                ("smtp.gmail.com", port),
+                (SMTP_HOST, port),
                 timeout=15
             )
 
             sock.close()
 
-            print(f"PORT {port}: CONNECTED")
+            print(
+                f"PORT {port}: CONNECTED"
+            )
 
             results[str(port)] = "CONNECTED"
 
         except Exception as e:
 
-            print(f"PORT {port}: FAILED")
-            print("ERROR:", repr(e))
+            print(
+                f"PORT {port}: FAILED"
+            )
 
-            results[str(port)] = f"FAILED: {repr(e)}"
+            print(
+                "ERROR:",
+                repr(e)
+            )
+
+            results[str(port)] = (
+                f"FAILED: {repr(e)}"
+            )
 
     return results
