@@ -10,9 +10,9 @@ SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 587
 
 SMTP_USERNAME = "hahishapp@gmail.com"
-SMTP_PASSWORD = "YOUR_NEW_APP_PASSWORD"
+SMTP_PASSWORD = "oschbpcxwcgmrfzv"
 
-TEST_RECEIVER = "your-test-email@gmail.com"
+TEST_RECEIVER = "urugendoturimo@gmail.com"
 
 
 async def send_test_email():
