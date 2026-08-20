@@ -1,212 +1,122 @@
 import os
-import socket
-import smtplib
-import traceback
-from email.message import EmailMessage
+import httpx
 
 from fastapi import APIRouter
 
 router = APIRouter()
 
-SMTP_HOST = "smtp.gmail.com"
-SMTP_PORT = 587
+BREVO_API_URL = "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"
 
-SMTP_USERNAME = os.getenv("SMTP_USER")
-SMTP_PASSWORD = os.getenv("SMTP_PASS")
-
-TEST_RECEIVER = os.getenv(
-    "TEST_RECEIVER",
-    "urugendoturimo@gmail.com"
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL")
+BREVO_SENDER_NAME = os.getenv(
+    "BREVO_SENDER_NAME",
+    "HahishApp"
 )
 
+TEST_RECEIVER = "urugendoturimo@gmail.com"
 
-async def send_test_email():
 
-    print("=" * 50)
-    print("1. TESTING DNS")
-    print("=" * 50)
+async def send_email(
+    to: str,
+    subject: str,
+    html_content: str
+):
 
-    try:
-        ip = socket.gethostbyname(SMTP_HOST)
-
-        print(
-            f"DNS OK: {SMTP_HOST} -> {ip}"
-        )
-
-    except Exception as e:
-
-        print("DNS FAILED:", repr(e))
-        traceback.print_exc()
-
+    if not BREVO_API_KEY:
+        print("BREVO_API_KEY is missing")
         return False
 
-    print("=" * 50)
-    print("2. TESTING TCP CONNECTION - PORT 587")
-    print("=" * 50)
-
-    try:
-
-        sock = socket.create_connection(
-            (SMTP_HOST, SMTP_PORT),
-            timeout=15
-        )
-
-        print(
-            f"TCP CONNECTION OK: "
-            f"{SMTP_HOST}:{SMTP_PORT}"
-        )
-
-        sock.close()
-
-    except Exception as e:
-
-        print(
-            f"TCP CONNECTION FAILED: "
-            f"{SMTP_HOST}:{SMTP_PORT}"
-        )
-
-        print("ERROR:", repr(e))
-        traceback.print_exc()
-
+    if not BREVO_SENDER_EMAIL:
+        print("BREVO_SENDER_EMAIL is missing")
         return False
 
-    print("=" * 50)
-    print("3. TESTING SMTP + TLS")
-    print("=" * 50)
+    payload = {
+        "sender": {
+            "name": BREVO_SENDER_NAME,
+            "email": BREVO_SENDER_EMAIL
+        },
+        "to": [
+            {
+                "email": to
+            }
+        ],
+        "subject": subject,
+        "htmlContent": html_content
+    }
+
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json"
+    }
 
     try:
 
-        if not SMTP_USERNAME:
-            print("ERROR: SMTP_USER is not configured")
-            return False
+        print("=" * 50)
+        print("SENDING EMAIL THROUGH BREVO")
+        print("=" * 50)
 
-        if not SMTP_PASSWORD:
-            print("ERROR: SMTP_PASS is not configured")
-            return False
-
-        message = EmailMessage()
-
-        message["Subject"] = "HahishApp SMTP Test"
-        message["From"] = SMTP_USERNAME
-        message["To"] = TEST_RECEIVER
-
-        message.set_content(
-            """
-Hello,
-
-This is a test email from HahishApp.
-
-If you received this email, Gmail SMTP is working from Render.
-
-HahishApp
-"""
-        )
-
-        with smtplib.SMTP(
-            SMTP_HOST,
-            SMTP_PORT,
+        async with httpx.AsyncClient(
             timeout=30
-        ) as smtp:
+        ) as client:
 
-            print("SMTP connection established")
-
-            smtp.set_debuglevel(1)
-
-            print("Starting TLS...")
-
-            smtp.starttls()
-
-            print("TLS OK")
-
-            print("Logging into Gmail...")
-
-            smtp.login(
-                SMTP_USERNAME,
-                SMTP_PASSWORD
+            response = await client.post(
+                BREVO_API_URL,
+                json=payload,
+                headers=headers
             )
 
-            print("GMAIL LOGIN OK")
+        print("BREVO STATUS:", response.status_code)
+        print("BREVO RESPONSE:", response.text)
 
-            print("Sending email...")
+        response.raise_for_status()
 
-            smtp.send_message(message)
-
-            print("EMAIL SENT SUCCESSFULLY")
+        print("EMAIL SENT SUCCESSFULLY")
 
         return True
 
     except Exception as e:
 
         print("=" * 50)
-        print("SMTP TEST FAILED")
+        print("BREVO EMAIL ERROR")
         print("=" * 50)
 
-        print(
-            "ERROR TYPE:",
-            type(e).__name__
-        )
-
-        print(
-            "ERROR:",
-            repr(e)
-        )
-
-        traceback.print_exc()
+        print("ERROR TYPE:", type(e).__name__)
+        print("ERROR:", str(e))
 
         return False
 
 
-@router.get("/test-email")
-async def test_email():
+@router.get("/test-brevo")
+async def test_brevo():
 
-    result = await send_test_email()
+    result = await send_email(
+        to=TEST_RECEIVER,
+        subject="HahishApp Brevo Test",
+        html_content="""
+        <html>
+        <body>
+
+            <h2 style="color:#2E7D32">
+                HahishApp
+            </h2>
+
+            <p>
+                This is a test email sent using
+                the Brevo HTTPS API.
+            </p>
+
+            <p>
+                If you received this message,
+                HahishApp email delivery is working.
+            </p>
+
+        </body>
+        </html>
+        """
+    )
 
     return {
         "success": result
     }
-
-
-@router.get("/test-email-ports")
-async def test_email_ports():
-
-    results = {}
-
-    for port in [465, 587]:
-
-        print("=" * 50)
-        print(
-            f"TESTING SMTP PORT {port}"
-        )
-        print("=" * 50)
-
-        try:
-
-            sock = socket.create_connection(
-                (SMTP_HOST, port),
-                timeout=15
-            )
-
-            sock.close()
-
-            print(
-                f"PORT {port}: CONNECTED"
-            )
-
-            results[str(port)] = "CONNECTED"
-
-        except Exception as e:
-
-            print(
-                f"PORT {port}: FAILED"
-            )
-
-            print(
-                "ERROR:",
-                repr(e)
-            )
-
-            results[str(port)] = (
-                f"FAILED: {repr(e)}"
-            )
-
-    return results
