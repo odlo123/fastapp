@@ -128,3 +128,32 @@ async def test_email():
     return {
         "success": result
     }
+@router.get("/test-email-ports")
+async def test_email_ports():
+
+    results = {}
+
+    for port in [465, 587]:
+
+        try:
+            print(f"Testing smtp.gmail.com:{port}")
+
+            sock = socket.create_connection(
+                ("smtp.gmail.com", port),
+                timeout=15
+            )
+
+            sock.close()
+
+            print(f"PORT {port}: CONNECTED")
+
+            results[str(port)] = "CONNECTED"
+
+        except Exception as e:
+
+            print(f"PORT {port}: FAILED")
+            print("ERROR:", repr(e))
+
+            results[str(port)] = f"FAILED: {repr(e)}"
+
+    return results
