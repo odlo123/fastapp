@@ -1,16 +1,16 @@
-import os
 import httpx
 
 from fastapi import APIRouter
 
 router = APIRouter()
 
-BREVO_API_URL ="https://api.brevo.com/v3/smtp/email"
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
-BREVO_API_KEY = "xsmtpsib-48acbef24463246121e533bd0de661f71923c8390ead31912c6bff9d625530bf-x7M5a3hylV8n7aO7"
+# TEMPORARY TEST ONLY
+BREVO_API_KEY = "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"
+
 BREVO_SENDER_EMAIL = "hahishapp@gmail.com"
 BREVO_SENDER_NAME = "HahishApp"
-
 
 TEST_RECEIVER = "urugendoturimo@gmail.com"
 
@@ -20,14 +20,6 @@ async def send_email(
     subject: str,
     html_content: str
 ):
-
-    if not BREVO_API_KEY:
-        print("BREVO_API_KEY is missing")
-        return False
-
-    if not BREVO_SENDER_EMAIL:
-        print("BREVO_SENDER_EMAIL is missing")
-        return False
 
     payload = {
         "sender": {
@@ -68,11 +60,11 @@ async def send_email(
         print("BREVO STATUS:", response.status_code)
         print("BREVO RESPONSE:", response.text)
 
-        response.raise_for_status()
+        if response.status_code == 201:
+            print("EMAIL SENT SUCCESSFULLY")
+            return True
 
-        print("EMAIL SENT SUCCESSFULLY")
-
-        return True
+        return False
 
     except Exception as e:
 
@@ -93,6 +85,7 @@ async def test_brevo():
         to=TEST_RECEIVER,
         subject="HahishApp Brevo Test",
         html_content="""
+        <!DOCTYPE html>
         <html>
         <body>
 
