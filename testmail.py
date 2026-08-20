@@ -5,10 +5,10 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-BREVO_API_URL = "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"
+BREVO_API_URL ="https://api.brevo.com/v3/smtp/email"
 
-BREVO_API_KEY = os.getenv("BREVO_API_KEY")
-BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL")
+BREVO_API_KEY = "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"
+BREVO_SENDER_EMAIL = "hahishapp@gmail.com"
 BREVO_SENDER_NAME = os.getenv(
     "BREVO_SENDER_NAME",
     "HahishApp"
