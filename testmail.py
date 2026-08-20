@@ -9,10 +9,8 @@ BREVO_API_URL ="https://api.brevo.com/v3/smtp/email"
 
 BREVO_API_KEY = "xsmtpsib-48acbef24463246121e533bd0de661f71923c8390ead31912c6bff9d625530bf-x7M5a3hylV8n7aO7"
 BREVO_SENDER_EMAIL = "hahishapp@gmail.com"
-BREVO_SENDER_NAME = os.getenv(
-    "BREVO_SENDER_NAME",
-    "HahishApp"
-)
+BREVO_SENDER_NAME = "HahishApp"
+
 
 TEST_RECEIVER = "urugendoturimo@gmail.com"
 
