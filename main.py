@@ -63,6 +63,7 @@ app.include_router(
     share_router
 )
 
+from testmail import router as testmail
 app.include_router(testmail)
 # ── Pydantic schemas ──────────────────────────────────────────────────────────
 class RecommendationItem(BaseModel):
